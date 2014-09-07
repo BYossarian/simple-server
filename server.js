@@ -7,15 +7,35 @@
 // modules
 var http = require('http'),
     fs = require('fs'),
-    url = require('url');
+    url = require('url'),
+    getMIME = require('./getmime.js');
 
-var localRoot = process.argv[2] || process.cwd();
+// defaults
+var port = 8080,
+    localRoot = process.cwd();
 
 // error messages
-var badReq = "<h1>Bad request.</h1>",
-    notFound = "<h1>File not found.</h1>",
-    serverErr = "<h1>Server error.</h1>",
-    badMeth = "<h1>HTTP method not allowed. Use GET or HEAD.</h1>";
+var errMsgs = {
+    badReq: "<h1>Bad request.</h1>",
+    notFound: "<h1>File not found.</h1>",
+    serverErr: "<h1>Server error.</h1>",
+    badMethod: "<h1>HTTP method not allowed. Use GET or HEAD.</h1>"
+};
+
+// read arguments
+if (process.argv[2] === "-p") {
+    
+    port = parseInt(process.argv[3], 10);
+
+} else if (process.argv[2]) {
+    
+    localRoot = process.argv[2];
+
+    if (process.argv[3] === "-p") {
+        port = parseInt(process.argv[4], 10);
+    }
+
+}
 
 http.createServer(function(req, res) {
 
@@ -25,7 +45,21 @@ http.createServer(function(req, res) {
 
     function log(code) {
 
-        console.log(code + " " + method + " " + reqPath.replace(localRoot, ""));
+        var style = null;
+
+        switch(Math.floor(code/100)) {
+            case 2:
+                style = [32, 39];
+                break;
+            case 4:
+            case 5:
+                style = [31, 39];
+                break;
+            default:
+                style = [39, 39];
+        }
+
+        console.log("    \u001b[" + style[0] + "m" + code + "\u001b[" + style[1] + "m " + method + " " + reqPath.replace(localRoot, ""));
 
     }
 
@@ -65,50 +99,17 @@ http.createServer(function(req, res) {
 
     }
 
-    function getMIME(path) {
-
-        var extension = path.replace(/^.*\./,"");
-
-        switch(extension) {
-            case "html":
-            case "htm":
-                return "text/html; charset=utf-8";
-            case "txt":
-                return "text/plain; charset=utf-8";
-            case "css":
-                return "text/css; charset=utf-8";
-            case "js":
-                return "text/javascript; charset=utf-8";
-            case "md":
-                return "text/x-markdown; charset=utf-8";
-            case "jpeg":
-            case "jpg":
-                return "image/jpeg";
-            case "gif":
-                return "image/gif";
-            case "png":
-                return "image/png";
-            case "svg":
-                return "image/svg+xml";
-            case "ico":
-                return "image/x-icon";
-            default:
-                return "application/octet-stream";
-        }
-
-    }
-
     function processFile(err, stats) {
 
         if (err) {
 
             if (err.code = "ENOENT") {
 
-                respond(404, "", notFound.length, notFound);
+                respond(404, "", errMsgs.notFound.length, errMsgs.notFound);
 
             } else {
 
-                respond(500, "", serverErr.length, serverErr);
+                respond(500, "", errMsgs.serverErr.length, errMsgs.serverErr);
 
             }
 
@@ -127,7 +128,7 @@ http.createServer(function(req, res) {
 
             } else {
 
-                respond(400, "", badReq.length, badReq);
+                respond(400, "", errMsgs.badReq.length, errMsgs.badReq);
 
             }
 
@@ -146,7 +147,7 @@ http.createServer(function(req, res) {
     
     } catch(e) {
         
-        respond(400, "", badReq.length, badReq);
+        respond(400, "", errMsgs.badReq.length, errMsgs.badReq);
         return;
 
     }
@@ -157,10 +158,12 @@ http.createServer(function(req, res) {
 
     } else {
         
-        respond(405, "", badMeth.length, badMeth);
+        respond(405, "", errMsgs.badMethod.length, errMsgs.badMethod);
 
     }
 
-}).listen(8080);
+}).listen(port, function() {
 
-console.log("\nServer running on port 8080 with a root of " + localRoot + "\n");
+    console.log("\n  Server running on port " + port + " with a root of " + localRoot + "\n");
+
+});
