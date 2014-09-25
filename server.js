@@ -8,6 +8,7 @@
 var http = require('http'),
     fs = require('fs'),
     url = require('url'),
+    path = require('path'),
     getMIME = require('./getmime.js');
 
 // defaults
@@ -22,7 +23,7 @@ var errMsgs = {
     badMethod: "<h1>HTTP method not allowed. Use GET or HEAD.</h1>"
 };
 
-// read arguments
+// read optional arguments: <SERVER ROOT DIRECTORY> -p <PORT NUMBER>
 if (process.argv[2] === "-p") {
     
     port = parseInt(process.argv[3], 10);
@@ -59,7 +60,7 @@ http.createServer(function(req, res) {
                 style = [39, 39];
         }
 
-        console.log("    \u001b[" + style[0] + "m" + code + "\u001b[" + style[1] + "m " + method + " " + reqPath.replace(localRoot, ""));
+        console.log("    \u001b[" + style[0] + "m" + code + "\u001b[" + style[1] + "m " + method + " " + reqPath);
 
     }
 
@@ -140,10 +141,11 @@ http.createServer(function(req, res) {
     try {
         
         reqPath = decodeURIComponent(url.parse(req.url).pathname);
+
         // prevent any attempt to move up the directory structure using something like ../ or /../
-        reqPath = reqPath.replace(/(^|[\/\\])\.\.(?=([\/\\]|$))/g, "").replace(/^\/?/, "/");
+        reqPath = path.normalize(reqPath);
         
-        reqPath = localRoot + reqPath;
+        reqPath = path.join(localRoot, reqPath);
     
     } catch(e) {
         
