@@ -1,7 +1,5 @@
 #!/usr/bin/env node --harmony
 
-// copy to /usr/local/bin/server
-
 "use strict";
 
 // modules
