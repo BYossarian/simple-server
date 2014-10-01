@@ -141,7 +141,7 @@ http.createServer(function(req, res) {
         reqPath = decodeURIComponent(url.parse(req.url).pathname);
 
         // prevent any attempt to move up the directory structure using something like ../ or /../
-        reqPath = path.normalize(reqPath);
+        reqPath = path.join('/', reqPath);
         
         reqPath = path.join(localRoot, reqPath);
     
