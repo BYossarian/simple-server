@@ -73,7 +73,7 @@ http.createServer(function(req, res) {
             'Content-Length': size
         });
 
-        if (method === "GET") {
+        if (method !== "HEAD") {
 
             if (body instanceof fs.ReadStream) {
 
