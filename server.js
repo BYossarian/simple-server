@@ -7,7 +7,7 @@ var http = require('http'),
     fs = require('fs'),
     url = require('url'),
     path = require('path'),
-    getMIME = require('lib/getmime.js');
+    getMIME = require('./lib/getmime.js');
 
 // defaults
 var port = 8080,
