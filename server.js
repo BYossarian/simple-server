@@ -7,7 +7,7 @@ var http = require('http'),
     fs = require('fs'),
     url = require('url'),
     path = require('path'),
-    getMIME = require('./lib/getmime.js');
+    mime = require('mime-types');
 
 // defaults
 var port = 8080,
@@ -66,7 +66,7 @@ http.createServer(function(req, res) {
 
         log(code);
 
-        type = type || 'text/html; charset=utf-8';
+        type = type || 'text/plain; charset=utf-8';
 
         res.writeHead(code, {
             'Content-Type': type,
@@ -117,7 +117,7 @@ http.createServer(function(req, res) {
             if (stats.isFile()) {
                 // file
 
-                respond(200, getMIME(reqPath), stats.size, fs.createReadStream(reqPath));
+                respond(200, mime.contentType(path.basename(reqPath)), stats.size, fs.createReadStream(reqPath));
 
             } else if (stats.isDirectory()) {
                 // directory

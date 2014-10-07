@@ -1,0 +1,26 @@
+{
+  "name": "simple-server",
+  "version": "0.2.0",
+  "description": "Just a basic server",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BYossarian/simple-server.git"
+  },
+  "keywords": [
+    "server"
+  ],
+  "author": "Ben Jackson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/BYossarian/simple-server/issues"
+  },
+  "homepage": "https://github.com/BYossarian/simple-server",
+  "dependencies": {
+    "mime-types": "^2.0.2"
+  }
+}
