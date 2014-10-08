@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/BYossarian/simple-server",
   "dependencies": {
+    "commander": "^2.3.0",
     "mime-types": "^2.0.2"
   }
 }

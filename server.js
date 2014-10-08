@@ -7,11 +7,8 @@ var http = require('http'),
     fs = require('fs'),
     url = require('url'),
     path = require('path'),
-    mime = require('mime-types');
-
-// defaults
-var port = 8080,
-    localRoot = process.cwd();
+    mime = require('mime-types'),
+    commander = require('commander');
 
 // error messages
 var errMsgs = {
@@ -21,19 +18,18 @@ var errMsgs = {
     badMethod: "<h1>HTTP method not allowed. Use GET or HEAD.</h1>"
 };
 
-// read optional arguments: <SERVER ROOT DIRECTORY> -p <PORT NUMBER>
-if (process.argv[2] === "-p") {
-    
-    port = parseInt(process.argv[3], 10);
+// parse arguments and set up options
+commander
+    .option('-p, --port <port>', 'The port to listen on (default: 8080)')
+    .option('-r --root <root>', 'The public file directory (default: current directory)')
+    .parse(process.argv);
 
-} else if (process.argv[2]) {
-    
-    localRoot = process.argv[2];
+// defaults
+var port = commander.port || 8080,
+    localRoot = process.cwd();
 
-    if (process.argv[3] === "-p") {
-        port = parseInt(process.argv[4], 10);
-    }
-
+if (commander.root) {
+    localRoot = path.resolve(process.cwd(), commander.root);
 }
 
 http.createServer(function(req, res) {
