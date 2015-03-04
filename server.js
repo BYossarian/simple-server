@@ -26,7 +26,7 @@ commander
     .parse(process.argv);
 
 // defaults
-var port = commander.port || 8080,
+var port = parseInt(commander.port, 10) || 8080,
     localRoot = process.cwd(),
     entryPage = '';
 
