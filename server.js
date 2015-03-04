@@ -83,11 +83,12 @@ function log(status, req) {
 http.createServer(function(request, res) {
 
     var req = {
-        original: request,
-        method: request.method,
-        path: '',
-        localPath: ''
-    };    
+            original: request,
+            method: request.method,
+            path: '',
+            localPath: ''
+        },
+        retriedReq = false;    
 
     function respond(code, type, size, body) {
 
@@ -128,8 +129,10 @@ http.createServer(function(request, res) {
 
             if (err.code === 'ENOENT') {
 
-                // single page app returns entry page:
-                if (entryPage) {
+                // single page app returns entry page
+                if (entryPage && !retriedReq) {
+                    // boolean to prevent loop (when entry page doesn't exist):
+                    retriedReq = true;
                     return processReq(entryPage);
                 }
 
