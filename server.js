@@ -23,12 +23,14 @@ commander
     .option('-p, --port <port>', 'The port to listen on (default: 8080)')
     .option('-r, --root <root>', 'The public file directory (default: current directory)')
     .option('-s, --single [page]', 'Set single page web app entry page (default: index.html)')
+    .option('-n, --network', 'Expose server to local network (otherwise it just binds to localhost)')
     .parse(process.argv);
 
 // defaults
 var port = parseInt(commander.port, 10) || 8080,
     localRoot = process.cwd(),
-    entryPage = '';
+    entryPage = '',
+    localhostOnly = true;
 
 if (typeof commander.single === 'string') {
     entryPage = commander.single;
@@ -38,6 +40,10 @@ if (typeof commander.single === 'string') {
 
 if (commander.root) {
     localRoot = path.resolve(process.cwd(), commander.root);
+}
+
+if (commander.network) {
+    localhostOnly = false;
 }
 
 function sanitiseURL(requestUrl) {
@@ -140,6 +146,8 @@ http.createServer(function(request, res) {
 
             }
 
+            console.log(err);
+
             return respond(500, '', errMsgs.serverErr.length, errMsgs.serverErr);
 
         }
@@ -185,7 +193,7 @@ http.createServer(function(request, res) {
 
     processReq(req.original.url);
 
-}).listen(port, function() {
+}).listen(port, localhostOnly ? 'localhost' : '0.0.0.0', function() {
 
     console.log('\n  Server running on port ' + port + ' with a root of ' + localRoot + '\n');
 
